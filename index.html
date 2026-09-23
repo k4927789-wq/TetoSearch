@@ -7,14 +7,22 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Buscador Web</h1>
-    <form id="search-form">
-      <input type="text" id="search-input" placeholder="Escribe tu búsqueda aquí..." required />
-      <button type="submit">Buscar</button>
-    </form>
+  <div class="search-card">
+    <h1 class="title">Buscador Web</h1>
     
-    <div id="results" class="results-container"></div>
+    <form id="search-form" class="search-box">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Escribe lo que quieras buscar..." 
+        autocomplete="off"
+        required 
+      />
+      <button type="submit" id="search-button">Buscar</button>
+    </form>
+
+    <div id="status-message" class="status-message"></div>
+    <div id="results-list" class="results-list"></div>
   </div>
 
   <script src="app.js"></script>
