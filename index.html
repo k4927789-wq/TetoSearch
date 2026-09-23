@@ -3,88 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TetoSearch - El Buscador Definitivo</title>
+  <title>TetoSearch - Navegador Privado</title>
   <link rel="icon" type="image/jpeg" href="https://files.catbox.moe/4yxgvp.jpeg">
   <link rel="stylesheet" href="style.css">
   
-  <!-- Deshabilitar caché del navegador para no dejar rastros en la PC -->
+  <!-- Deshabilitar almacenamiento en caché del sistema -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 </head>
 <body oncontextmenu="return false;">
 
-  <!-- PANTALLA PRINCIPAL: TETO SEARCH -->
-  <div id="teto-home" class="teto-container">
-    
-    <!-- Encabezado con Perfil y Links -->
-    <header class="top-nav">
-      <button id="open-history-btn" class="nav-btn-link">Historial Privado (RAM)</button>
-      <div class="profile-avatar">
-        <img src="https://files.catbox.moe/4yxgvp.jpeg" alt="Teto Avatar">
+  <div id="app-container">
+    <!-- ENCABEZADO -->
+    <header class="top-header">
+      <button id="btn-ram-history" class="header-link">Historial Privado (RAM)</button>
+      <div class="avatar-box">
+        <img src="https://files.catbox.moe/4yxgvp.jpeg" alt="Teto Icon" class="avatar-img">
       </div>
     </header>
 
-    <!-- Contenido Central con Banner y Buscador -->
-    <main class="main-content">
+    <!-- PANTALLA PRINCIPAL DE BÚSQUEDA -->
+    <main id="search-view" class="main-view">
       
-      <!-- Banner de Kasane Teto -->
-      <div class="banner-wrapper">
-        <img src="https://files.catbox.moe/pe3jle.jpeg" alt="Teto Banner" class="teto-banner">
+      <div class="banner-box">
+        <img src="https://files.catbox.moe/pe3jle.jpeg" alt="Teto Banner" class="banner-img">
       </div>
 
-      <!-- Título de la marca TetoSearch -->
-      <h1 class="logo-title">
-        <span class="teto-red">Teto</span><span class="teto-pink">Search</span>
-      </h1>
+      <h1 class="brand-title"><span class="red">Teto</span><span class="pink">Search</span></h1>
 
-      <!-- Caja de Búsqueda -->
-      <form id="search-form" class="search-box">
-        <div class="search-icon">
-          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        </div>
-        <input type="text" id="search-input" placeholder="Buscar en la web con TetoSearch o escribir URL..." autocomplete="off" spellcheck="false">
+      <form id="teto-search-form" class="search-bar-container">
+        <span class="search-icon">&#128269;</span>
+        <input type="text" id="main-search-input" placeholder="Escribe lo que quieras buscar o una URL..." autocomplete="off" spellcheck="false">
       </form>
 
-      <div class="buttons-row">
-        <button type="button" id="btn-search" class="teto-btn">Buscar en TetoSearch</button>
-        <button type="button" id="btn-panic" class="panic-btn">Boton de Pánico (Destruir Todo)</button>
+      <div class="action-buttons">
+        <button type="submit" form="teto-search-form" class="btn-primary">Buscar en la Web</button>
+        <button type="button" id="btn-panic" class="btn-danger">Pánico (Borrar RAM)</button>
       </div>
     </main>
+
+    <!-- RESULTADOS / NAVEGADOR -->
+    <section id="results-view" class="results-view hidden">
+      <div class="nav-bar">
+        <button id="btn-home" title="Inicio">&#8962;</button>
+        <input type="text" id="nav-url-input" class="nav-input">
+        <button id="btn-clear-session" title="Limpiar">&#10005;</button>
+      </div>
+
+      <!-- Contenedor donde se renderizan los resultados dinámicos sin iframe bloqueado -->
+      <div id="results-content" class="results-content"></div>
+    </section>
+
+    <!-- PANEL DE HISTORIAL -->
+    <aside id="history-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Historial en Memoria RAM</h3>
+          <button id="close-history">&times;</button>
+        </div>
+        <p class="history-info">Este historial solo existe en la memoria volátil. Si cierras la pestaña o pulsas "Borrar", no quedará registro en la computadora ni en el navegador.</p>
+        <ul id="history-ul"></ul>
+        <button id="btn-purge-ram" class="btn-danger full-width">Destruir Historial de Memoria</button>
+      </div>
+    </aside>
   </div>
-
-  <!-- NAVEGADOR Y VISUALIZADOR DE PÁGINAS REALES -->
-  <div id="browser-view" class="browser-container hidden">
-    <!-- Barra Superior de Navegación -->
-    <div class="browser-bar">
-      <button id="btn-back" title="Atrás">&#8592;</button>
-      <button id="btn-forward" title="Adelante">&#8594;</button>
-      <button id="btn-reload" title="Recargar">&#8635;</button>
-      <button id="btn-home" title="Inicio TetoSearch">&#8962;</button>
-
-      <input type="text" id="browser-url-input" class="browser-input">
-      
-      <button id="btn-toggle-history" title="Historial">&#128336;</button>
-    </div>
-
-    <!-- Contenedor iframe Anti-Pantalla en Blanco -->
-    <div class="iframe-wrapper">
-      <iframe id="web-viewport" allowfullscreen></iframe>
-    </div>
-  </div>
-
-  <!-- HISTORIAL EN MEMORIA RAM (TOTALMENTE PRIVADO) -->
-  <aside id="history-panel" class="history-panel hidden">
-    <div class="history-header">
-      <h3>Historial Privado en RAM</h3>
-      <button id="close-history-btn">&times;</button>
-    </div>
-    <p class="history-warn">Este historial vive únicamente en la memoria de esta pestaña. Si cierras la ventana o tocas el Botón de Pánico, nada quedará en la PC.</p>
-    <ul id="history-list"></ul>
-    <button id="clear-history-now">Borrar Historial Ahora</button>
-  </aside>
 
   <script src="app.js"></script>
 </body>
 </html>
-
