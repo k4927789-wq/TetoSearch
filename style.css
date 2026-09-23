@@ -1,0 +1,206 @@
+:root {
+    --ts-brand: #ff4081;
+    --ts-bg: #ffffff;
+    --ts-text: #202124;
+    --ts-border: #dfe1e5;
+    --ts-shadow: 0 1px 6px rgba(32,33,36,0.28);
+}
+
+/* Reset estricto para anular inyecciones de CSS de extensiones */
+*, *::before, *::after {
+    box-sizing: border-box !important;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+
+body, html {
+    width: 100% !important;
+    height: 100% !important;
+    background-color: var(--ts-bg) !important;
+    color: var(--ts-text) !important;
+    overflow-x: hidden;
+}
+
+/* ================= VISTA DE INICIO ================= */
+#ts-home-view {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+    padding: 20px !important;
+}
+
+.ts-logo-main {
+    font-size: 4.5rem !important;
+    font-weight: bold !important;
+    color: var(--ts-brand) !important;
+    margin-bottom: 25px !important;
+    user-select: none !important;
+    letter-spacing: -1px !important;
+}
+
+.ts-input-box {
+    width: 100% !important;
+    max-width: 584px !important;
+    border: 1px solid var(--ts-border) !important;
+    border-radius: 24px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    background: #fff !important;
+    transition: box-shadow 0.2s !important;
+}
+
+.ts-input-box:hover, .ts-input-box:focus-within {
+    box-shadow: var(--ts-shadow) !important;
+    border-color: transparent !important;
+}
+
+.ts-field {
+    flex: 1 !important;
+    border: none !important;
+    outline: none !important;
+    font-size: 16px !important;
+    margin: 0 10px !important;
+    background: transparent !important;
+    color: var(--ts-text) !important;
+}
+
+.ts-icon, .ts-icon-action {
+    cursor: pointer !important;
+    fill: #70757a !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0 !important;
+}
+
+.ts-actions {
+    margin-top: 25px !important;
+    display: flex !important;
+    gap: 12px !important;
+}
+
+.ts-btn {
+    background-color: #f8f9fa !important;
+    border: 1px solid #f8f9fa !important;
+    border-radius: 4px !important;
+    color: #3c4043 !important;
+    font-size: 14px !important;
+    padding: 10px 16px !important;
+    cursor: pointer !important;
+}
+
+.ts-btn:hover {
+    border-color: #dadce0 !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1) !important;
+}
+
+/* ================= VISTA DE RESULTADOS ================= */
+#ts-results-view {
+    display: none;
+    width: 100% !important;
+    min-height: 100vh !important;
+}
+
+.ts-header {
+    display: flex !important;
+    align-items: center !important;
+    padding: 20px 30px !important;
+    border-bottom: 1px solid #ebebeb !important;
+    gap: 30px !important;
+    position: sticky !important;
+    top: 0 !important;
+    background: #ffffff !important;
+    z-index: 99999 !important;
+}
+
+.ts-logo-small {
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    color: var(--ts-brand) !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+}
+
+.ts-header-box {
+    max-width: 690px !important;
+}
+
+.ts-filter-bar {
+    display: flex !important;
+    gap: 20px !important;
+    padding: 0 180px !important;
+    border-bottom: 1px solid #ebebeb !important;
+    background-color: #fafafa !important;
+}
+
+.ts-tab {
+    padding: 12px 0 !important;
+    font-size: 14px !important;
+    color: #5f6368 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    border-bottom: 3px solid transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.ts-tab-active {
+    color: var(--ts-brand) !important;
+    border-bottom-color: var(--ts-brand) !important;
+    font-weight: bold !important;
+}
+
+.ts-main-content {
+    padding: 20px 180px !important;
+    max-width: 900px !important;
+}
+
+.ts-stats {
+    font-size: 14px !important;
+    color: #70757a !important;
+    margin-bottom: 20px !important;
+}
+
+.ts-item-card {
+    margin-bottom: 28px !important;
+}
+
+.ts-item-site {
+    font-size: 14px !important;
+    color: #202124 !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+}
+
+.ts-item-title {
+    font-size: 20px !important;
+    color: #1a0dab !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    margin-bottom: 4px !important;
+}
+
+.ts-item-title:hover {
+    text-decoration: underline !important;
+}
+
+.ts-item-desc {
+    font-size: 14px !important;
+    color: #4d5156 !important;
+    line-height: 1.58 !important;
+}
+
+@media (max-width: 800px) {
+    .ts-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 15px !important;
+    }
+    .ts-filter-bar, .ts-main-content {
+        padding: 10px 20px !important;
+    }
+}
