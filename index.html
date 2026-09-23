@@ -3,78 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Navegador Privado</title>
-  <!-- Estilos aislados contra inyecciones de extensiones -->
+  <title>TetoSearch - El Buscador Definitivo</title>
+  <link rel="icon" type="image/jpeg" href="https://files.catbox.moe/4yxgvp.jpeg">
   <link rel="stylesheet" href="style.css">
-  <!-- Deshabilitar caché local e historial del navegador host -->
+  
+  <!-- Deshabilitar caché del navegador para no dejar rastros en la PC -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
-  <header class="browser-bar">
-    <div class="nav-controls">
-      <button id="back-btn" title="Atrás" disabled>&#8592;</button>
-      <button id="forward-btn" title="Adelante" disabled>&#8594;</button>
-      <button id="reload-btn" title="Recargar">&#8635;</button>
-      <button id="home-btn" title="Inicio">&#8962;</button>
-    </div>
-
-    <form id="search-form" class="url-form">
-      <input 
-        type="text" 
-        id="url-input" 
-        placeholder="Busca en la web o escribe una URL..." 
-        autocomplete="off" 
-        autocorrect="off" 
-        autocapitalize="off" 
-        spellcheck="false"
-      >
-      <button type="submit">Buscar</button>
-    </form>
-
-    <div class="menu-controls">
-      <button id="history-toggle-btn" title="Historial Privado">&#128336;</button>
-    </div>
-  </header>
-
-  <!-- CONTENEDOR PRINCIPAL -->
-  <main class="viewport-container">
-    <!-- Pantalla de inicio estilo Google -->
-    <section id="home-screen" class="home-screen">
-      <h1 class="logo">Search<span>Private</span></h1>
-      <form id="home-search-form" class="home-search-box">
-        <input type="text" id="home-search-input" placeholder="Buscar en Google o escribir dirección..." autocomplete="off">
-        <div class="home-buttons">
-          <button type="submit">Buscar en la Web</button>
-        </div>
-      </form>
-    </section>
-
-    <!-- Visualizador Aislado de Páginas Web -->
-    <div id="frame-wrapper" class="frame-wrapper hidden">
-      <!-- Sandbox estricto contra lecturas de extensiones del navegador -->
-      <iframe 
-        id="web-viewport" 
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
-        referrerpolicy="no-referrer"
-      ></iframe>
-    </div>
-
-    <!-- Panel de Historial (Solo en memoria RAM) -->
-    <aside id="history-panel" class="history-panel hidden">
-      <div class="history-header">
-        <h3>Historial Privado (Sesión Actual)</h3>
-        <button id="close-history">&#10005;</button>
+  <!-- PANTALLA PRINCIPAL: TETO SEARCH -->
+  <div id="teto-home" class="teto-container">
+    
+    <!-- Encabezado con Perfil y Links -->
+    <header class="top-nav">
+      <button id="open-history-btn" class="nav-btn-link">Historial Privado (RAM)</button>
+      <div class="profile-avatar">
+        <img src="https://files.catbox.moe/4yxgvp.jpeg" alt="Teto Avatar">
       </div>
-      <p class="history-note">Este historial vive únicamente en la memoria de esta pestaña. Se borra automáticamente al cerrar la página.</p>
-      <ul id="history-list"></ul>
-      <button id="clear-history-btn">Borrar Historial Ahora</button>
-    </aside>
-  </main>
+    </header>
+
+    <!-- Contenido Central con Banner y Buscador -->
+    <main class="main-content">
+      
+      <!-- Banner de Kasane Teto -->
+      <div class="banner-wrapper">
+        <img src="https://files.catbox.moe/pe3jle.jpeg" alt="Teto Banner" class="teto-banner">
+      </div>
+
+      <!-- Título de la marca TetoSearch -->
+      <h1 class="logo-title">
+        <span class="teto-red">Teto</span><span class="teto-pink">Search</span>
+      </h1>
+
+      <!-- Caja de Búsqueda -->
+      <form id="search-form" class="search-box">
+        <div class="search-icon">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </div>
+        <input type="text" id="search-input" placeholder="Buscar en la web con TetoSearch o escribir URL..." autocomplete="off" spellcheck="false">
+      </form>
+
+      <div class="buttons-row">
+        <button type="button" id="btn-search" class="teto-btn">Buscar en TetoSearch</button>
+        <button type="button" id="btn-panic" class="panic-btn">Boton de Pánico (Destruir Todo)</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- NAVEGADOR Y VISUALIZADOR DE PÁGINAS REALES -->
+  <div id="browser-view" class="browser-container hidden">
+    <!-- Barra Superior de Navegación -->
+    <div class="browser-bar">
+      <button id="btn-back" title="Atrás">&#8592;</button>
+      <button id="btn-forward" title="Adelante">&#8594;</button>
+      <button id="btn-reload" title="Recargar">&#8635;</button>
+      <button id="btn-home" title="Inicio TetoSearch">&#8962;</button>
+
+      <input type="text" id="browser-url-input" class="browser-input">
+      
+      <button id="btn-toggle-history" title="Historial">&#128336;</button>
+    </div>
+
+    <!-- Contenedor iframe Anti-Pantalla en Blanco -->
+    <div class="iframe-wrapper">
+      <iframe id="web-viewport" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- HISTORIAL EN MEMORIA RAM (TOTALMENTE PRIVADO) -->
+  <aside id="history-panel" class="history-panel hidden">
+    <div class="history-header">
+      <h3>Historial Privado en RAM</h3>
+      <button id="close-history-btn">&times;</button>
+    </div>
+    <p class="history-warn">Este historial vive únicamente en la memoria de esta pestaña. Si cierras la ventana o tocas el Botón de Pánico, nada quedará en la PC.</p>
+    <ul id="history-list"></ul>
+    <button id="clear-history-now">Borrar Historial Ahora</button>
+  </aside>
 
   <script src="app.js"></script>
 </body>
 </html>
+
