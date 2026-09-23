@@ -1,156 +1,147 @@
 /**
- * SERVIDOR PROXY PARA DESBLOQUEO Y EVITACIÓN DE BLOQUEOS
- * Para eliminar restrinciones regionales y headers anti-iframe (X-Frame-Options),
- * las URLs pasan por un Web Proxy sin guardar registros.
+ * ESTADO EN MEMORIA RAM
+ * No guarda datos en localStorage, sessionStorage ni Cookies de la computadora.
  */
-const PROXY_SERVER = "https://api.allorigins.win/raw?url="; 
-
-// ESTADO EN MEMORIA VOLÁTIL (No utiliza localStorage, sessionStorage ni Cookies)
-const RAM_STATE = {
-  history: [],
-  currentIndex: -1
+const MEMORIA_TETO = {
+  historial: [],
+  posicion: -1
 };
 
-// ELEMENTOS DEL DOM
-const urlInput = document.getElementById('url-input');
+// DOM
+const tetoHome = document.getElementById('teto-home');
+const browserView = document.getElementById('browser-view');
 const searchForm = document.getElementById('search-form');
-const homeSearchForm = document.getElementById('home-search-form');
-const homeSearchInput = document.getElementById('home-search-input');
+const searchInput = document.getElementById('search-input');
+const btnSearch = document.getElementById('btn-search');
+const btnPanic = document.getElementById('btn-panic');
+
 const webViewport = document.getElementById('web-viewport');
-const homeScreen = document.getElementById('home-screen');
-const frameWrapper = document.getElementById('frame-wrapper');
+const browserUrlInput = document.getElementById('browser-url-input');
 
-const backBtn = document.getElementById('back-btn');
-const forwardBtn = document.getElementById('forward-btn');
-const reloadBtn = document.getElementById('reload-btn');
-const homeBtn = document.getElementById('home-btn');
+const btnBack = document.getElementById('btn-back');
+const btnForward = document.getElementById('btn-forward');
+const btnReload = document.getElementById('btn-reload');
+const btnHome = document.getElementById('btn-home');
 
-const historyToggleBtn = document.getElementById('history-toggle-btn');
 const historyPanel = document.getElementById('history-panel');
-const closeHistoryBtn = document.getElementById('close-history');
+const openHistoryBtn = document.getElementById('open-history-btn');
+const closeHistoryBtn = document.getElementById('close-history-btn');
+const btnToggleHistory = document.getElementById('btn-toggle-history');
 const historyList = document.getElementById('history-list');
-const clearHistoryBtn = document.getElementById('clear-history-btn');
+const clearHistoryNow = document.getElementById('clear-history-now');
 
-// NAVEGACIÓN Y PROCESAMIENTO DE BÚSQUEDAS
-function navigate(query) {
-  if (!query.trim()) return;
+// MOTOR DE BÚSQUEDA REAL SIN BLOQUEO EN BLANCO
+function procesarBusqueda(consulta) {
+  if (!consulta.trim()) return;
 
-  let targetUrl = "";
+  let urlDestino = "";
+  const esUrlValida = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/.*)?$/i.test(consulta.trim());
 
-  // Validar si es una dirección URL válida o una consulta de búsqueda
-  const isUrl = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/.*)?$/i.test(query.trim());
-
-  if (isUrl) {
-    targetUrl = query.startsWith('http') ? query : `https://${query}`;
+  if (esUrlValida) {
+    urlDestino = consulta.startsWith('http') ? consulta : `https://${consulta}`;
   } else {
-    // Búsqueda directa simulando motor de búsqueda sin rastreo
-    targetUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    // Motor optimizado en HTML ligero que NO se bloquea en iframe
+    urlDestino = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(consulta)}`;
   }
 
-  // Cargar mediante proxy para saltar restricciones geográficas y de cabeceras
-  const proxiedUrl = PROXY_SERVER + encodeURIComponent(targetUrl);
+  // Cargar url
+  tetoHome.classList.add('hidden');
+  browserView.classList.remove('hidden');
 
-  // Ocultar pantalla de inicio y mostrar viewport
-  homeScreen.classList.add('hidden');
-  frameWrapper.classList.remove('hidden');
+  webViewport.src = urlDestino;
+  browserUrlInput.value = urlDestino;
 
-  webViewport.src = proxiedUrl;
-  urlInput.value = targetUrl;
-
-  // Registrar en el historial en memoria RAM
-  recordHistory(targetUrl);
+  guardarEnHistorialRAM(urlDestino);
 }
 
-// CONTROL DE HISTORIAL PRIVADO EN MEMORIA (RAM)
-function recordHistory(url) {
-  // Cortar ramas futuras si se navega desde un punto intermedio
-  if (RAM_STATE.currentIndex < RAM_STATE.history.length - 1) {
-    RAM_STATE.history = RAM_STATE.history.slice(0, RAM_STATE.currentIndex + 1);
+// GUARDAR HISTORIAL SOLO EN MEMORIA RAM
+function guardarEnHistorialRAM(url) {
+  if (MEMORIA_TETO.posicion < MEMORIA_TETO.historial.length - 1) {
+    MEMORIA_TETO.historial = MEMORIA_TETO.historial.slice(0, MEMORIA_TETO.posicion + 1);
   }
 
-  RAM_STATE.history.push(url);
-  RAM_STATE.currentIndex = RAM_STATE.history.length - 1;
+  MEMORIA_TETO.historial.push(url);
+  MEMORIA_TETO.posicion = MEMORIA_TETO.historial.length - 1;
 
-  updateUI();
-  renderHistoryUI();
+  actualizarListaHistorialUI();
 }
 
-function updateUI() {
-  backBtn.disabled = RAM_STATE.currentIndex <= 0;
-  forwardBtn.disabled = RAM_STATE.currentIndex >= RAM_STATE.history.length - 1;
-}
-
-function renderHistoryUI() {
+function actualizarListaHistorialUI() {
   historyList.innerHTML = "";
-  RAM_STATE.history.forEach((item, index) => {
+  MEMORIA_TETO.historial.forEach((url, i) => {
     const li = document.createElement('li');
-    li.textContent = `${index + 1}. ${item}`;
-    li.addEventListener('click', () => {
-      RAM_STATE.currentIndex = index;
-      webViewport.src = PROXY_SERVER + encodeURIComponent(item);
-      urlInput.value = item;
-      updateUI();
-    });
+    li.textContent = `${i + 1}. ${url}`;
+    li.onclick = () => {
+      MEMORIA_TETO.posicion = i;
+      webViewport.src = url;
+      browserUrlInput.value = url;
+    };
     historyList.appendChild(li);
   });
 }
 
-// LISTENERS DE EVENTOS
+// BOTÓN DE PÁNICO (BORRA TODO DE LA RAM)
+function destruccionPrivada() {
+  MEMORIA_TETO.historial = [];
+  MEMORIA_TETO.posicion = -1;
+  historyList.innerHTML = "";
+  webViewport.src = "about:blank";
+  searchInput.value = "";
+  browserUrlInput.value = "";
+  
+  browserView.classList.add('hidden');
+  historyPanel.classList.add('hidden');
+  tetoHome.classList.remove('hidden');
+  
+  alert("TetoSearch: ¡Historial y datos en memoria RAM eliminados!");
+}
+
+// LISTENERS
 searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  navigate(urlInput.value);
+  procesarBusqueda(searchInput.value);
 });
 
-homeSearchForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  navigate(homeSearchInput.value);
+btnSearch.addEventListener('click', () => {
+  procesarBusqueda(searchInput.value);
 });
 
-backBtn.addEventListener('click', () => {
-  if (RAM_STATE.currentIndex > 0) {
-    RAM_STATE.currentIndex--;
-    const previousUrl = RAM_STATE.history[RAM_STATE.currentIndex];
-    webViewport.src = PROXY_SERVER + encodeURIComponent(previousUrl);
-    urlInput.value = previousUrl;
-    updateUI();
+browserUrlInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    procesarBusqueda(browserUrlInput.value);
   }
 });
 
-forwardBtn.addEventListener('click', () => {
-  if (RAM_STATE.currentIndex < RAM_STATE.history.length - 1) {
-    RAM_STATE.currentIndex++;
-    const nextUrl = RAM_STATE.history[RAM_STATE.currentIndex];
-    webViewport.src = PROXY_SERVER + encodeURIComponent(nextUrl);
-    urlInput.value = nextUrl;
-    updateUI();
+btnHome.addEventListener('click', () => {
+  browserView.classList.add('hidden');
+  tetoHome.classList.remove('hidden');
+});
+
+btnReload.addEventListener('click', () => {
+  if (webViewport.src) webViewport.src = webViewport.src;
+});
+
+btnBack.addEventListener('click', () => {
+  if (MEMORIA_TETO.posicion > 0) {
+    MEMORIA_TETO.posicion--;
+    const url = MEMORIA_TETO.historial[MEMORIA_TETO.posicion];
+    webViewport.src = url;
+    browserUrlInput.value = url;
   }
 });
 
-reloadBtn.addEventListener('click', () => {
-  if (webViewport.src) {
-    webViewport.src = webViewport.src;
+btnForward.addEventListener('click', () => {
+  if (MEMORIA_TETO.posicion < MEMORIA_TETO.historial.length - 1) {
+    MEMORIA_TETO.posicion++;
+    const url = MEMORIA_TETO.historial[MEMORIA_TETO.posicion];
+    webViewport.src = url;
+    browserUrlInput.value = url;
   }
 });
 
-homeBtn.addEventListener('click', () => {
-  frameWrapper.classList.add('hidden');
-  homeScreen.classList.remove('hidden');
-  urlInput.value = "";
-  homeSearchInput.value = "";
-});
-
-historyToggleBtn.addEventListener('click', () => {
-  historyPanel.classList.toggle('hidden');
-});
-
-closeHistoryBtn.addEventListener('click', () => {
-  historyPanel.classList.add('hidden');
-});
-
-clearHistoryBtn.addEventListener('click', () => {
-  RAM_STATE.history = [];
-  RAM_STATE.currentIndex = -1;
-  renderHistoryUI();
-  updateUI();
-});
+openHistoryBtn.addEventListener('click', () => historyPanel.classList.remove('hidden'));
+btnToggleHistory.addEventListener('click', () => historyPanel.classList.toggle('hidden'));
+closeHistoryBtn.addEventListener('click', () => historyPanel.classList.add('hidden'));
+clearHistoryNow.addEventListener('click', destruccionPrivada);
+btnPanic.addEventListener('click', destruccionPrivada);
 
