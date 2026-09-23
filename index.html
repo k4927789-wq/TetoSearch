@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" translate="no" class="notranslate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>TetoSearch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body translate="no" class="notranslate">
+
+    <!-- VISTA DE INICIO (HOME) -->
+    <div id="ts-home-view">
+        <div class="ts-logo-main">TetoSearch</div>
+        
+        <div class="ts-input-box">
+            <svg class="ts-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="ts-home-query" class="ts-field" placeholder="Buscar en TetoSearch..." autocomplete="off" spellcheck="false" onkeydown="handleKeyPress(event, 'home')">
+            <svg class="ts-icon-action" title="Búsqueda por Voz" onclick="startVoiceSearch()" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </div>
+
+        <div class="ts-actions">
+            <button class="ts-btn" onclick="executeSearch('home')">Buscar con TetoSearch</button>
+            <button class="ts-btn" onclick="luckySearch()">Me siento con suerte</button>
+        </div>
+    </div>
+
+    <!-- VISTA DE RESULTADOS A PANTALLA COMPLETA -->
+    <div id="ts-results-view">
+        <!-- Encabezado Superior -->
+        <header class="ts-header">
+            <a class="ts-logo-small" onclick="goHome()">TetoSearch</a>
+            <div class="ts-input-box ts-header-box">
+                <input type="text" id="ts-results-query" class="ts-field" autocomplete="off" spellcheck="false" onkeydown="handleKeyPress(event, 'results')">
+                <svg class="ts-icon-action" title="Buscar" onclick="executeSearch('results')" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </div>
+        </header>
+
+        <!-- Navegación de Filtros -->
+        <nav class="ts-filter-bar">
+            <a class="ts-tab ts-tab-active" onclick="switchTab(this)">🔍 Todos</a>
+            <a class="ts-tab" onclick="switchTab(this)">🖼️ Imágenes</a>
+            <a class="ts-tab" onclick="switchTab(this)">📰 Noticias</a>
+            <a class="ts-tab" onclick="switchTab(this)">🎥 Videos</a>
+            <a class="ts-tab" onclick="switchTab(this)">⚙️ Herramientas</a>
+        </nav>
+
+        <!-- Resultados -->
+        <main class="ts-main-content">
+            <div id="ts-stats-counter" class="ts-stats"></div>
+            <div id="ts-feed-list"></div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
