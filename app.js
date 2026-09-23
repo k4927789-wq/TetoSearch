@@ -1,147 +1,110 @@
-/**
- * ESTADO EN MEMORIA RAM
- * No guarda datos en localStorage, sessionStorage ni Cookies de la computadora.
- */
-const MEMORIA_TETO = {
-  historial: [],
-  posicion: -1
-};
+// MEMORIA RAM VOLÁTIL (Sin guardado en el disco de la computadora)
+const MEMORIA_RAM = [];
 
 // DOM
-const tetoHome = document.getElementById('teto-home');
-const browserView = document.getElementById('browser-view');
-const searchForm = document.getElementById('search-form');
-const searchInput = document.getElementById('search-input');
-const btnSearch = document.getElementById('btn-search');
-const btnPanic = document.getElementById('btn-panic');
+const searchForm = document.getElementById('teto-search-form');
+const mainInput = document.getElementById('main-search-input');
+const searchView = document.getElementById('search-view');
+const resultsView = document.getElementById('results-view');
+const resultsContent = document.getElementById('results-content');
+const navUrlInput = document.getElementById('nav-url-input');
 
-const webViewport = document.getElementById('web-viewport');
-const browserUrlInput = document.getElementById('browser-url-input');
-
-const btnBack = document.getElementById('btn-back');
-const btnForward = document.getElementById('btn-forward');
-const btnReload = document.getElementById('btn-reload');
 const btnHome = document.getElementById('btn-home');
+const btnPanic = document.getElementById('btn-panic');
+const btnRamHistory = document.getElementById('btn-ram-history');
+const historyModal = document.getElementById('history-modal');
+const closeHistory = document.getElementById('close-history');
+const historyUl = document.getElementById('history-ul');
+const btnPurgeRam = document.getElementById('btn-purge-ram');
 
-const historyPanel = document.getElementById('history-panel');
-const openHistoryBtn = document.getElementById('open-history-btn');
-const closeHistoryBtn = document.getElementById('close-history-btn');
-const btnToggleHistory = document.getElementById('btn-toggle-history');
-const historyList = document.getElementById('history-list');
-const clearHistoryNow = document.getElementById('clear-history-now');
+// EJECUTAR BÚSQUEDA PRIVADA REAL
+async function ejecutarBusqueda(query) {
+  if (!query.trim()) return;
 
-// MOTOR DE BÚSQUEDA REAL SIN BLOQUEO EN BLANCO
-function procesarBusqueda(consulta) {
-  if (!consulta.trim()) return;
+  // Registrar en memoria RAM
+  MEMORIA_RAM.push(query);
+  actualizarHistorialUI();
 
-  let urlDestino = "";
-  const esUrlValida = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/.*)?$/i.test(consulta.trim());
+  searchView.classList.add('hidden');
+  resultsView.classList.remove('hidden');
+  navUrlInput.value = query;
 
-  if (esUrlValida) {
-    urlDestino = consulta.startsWith('http') ? consulta : `https://${consulta}`;
-  } else {
-    // Motor optimizado en HTML ligero que NO se bloquea en iframe
-    urlDestino = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(consulta)}`;
+  resultsContent.innerHTML = `<p style="color:var(--teto-pink)">Buscando resultados en tiempo real para: <b>${query}</b>...</p>`;
+
+  try {
+    // API libre de búsquedas para evitar el error de iframe triste
+    const res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&pretty=1`);
+    const data = await res.json();
+
+    resultsContent.innerHTML = "";
+
+    if (data.AbstractText) {
+      resultsContent.innerHTML += `
+        <div class="result-card">
+          <a href="${data.AbstractURL}" target="_blank" rel="noreferrer">${data.Heading}</a>
+          <p>${data.AbstractText}</p>
+        </div>
+      `;
+    }
+
+    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+      data.RelatedTopics.forEach(topic => {
+        if (topic.Text && topic.FirstURL) {
+          resultsContent.innerHTML += `
+            <div class="result-card">
+              <a href="${topic.FirstURL}" target="_blank" rel="noreferrer">${topic.Text.split(' - ')[0] || 'Resultado'}</a>
+              <p>${topic.Text}</p>
+            </div>
+          `;
+        }
+      });
+    } else if (!data.AbstractText) {
+      resultsContent.innerHTML = `
+        <div class="result-card">
+          <p>No se encontraron resultados directos API. <a href="https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}" target="_blank" rel="noreferrer">Haz clic aquí para abrir los resultados completos en pestaña privada</a></p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    resultsContent.innerHTML = `<p style="color:red">Error al consultar la red. Intenta de nuevo.</p>`;
   }
-
-  // Cargar url
-  tetoHome.classList.add('hidden');
-  browserView.classList.remove('hidden');
-
-  webViewport.src = urlDestino;
-  browserUrlInput.value = urlDestino;
-
-  guardarEnHistorialRAM(urlDestino);
 }
 
-// GUARDAR HISTORIAL SOLO EN MEMORIA RAM
-function guardarEnHistorialRAM(url) {
-  if (MEMORIA_TETO.posicion < MEMORIA_TETO.historial.length - 1) {
-    MEMORIA_TETO.historial = MEMORIA_TETO.historial.slice(0, MEMORIA_TETO.posicion + 1);
-  }
-
-  MEMORIA_TETO.historial.push(url);
-  MEMORIA_TETO.posicion = MEMORIA_TETO.historial.length - 1;
-
-  actualizarListaHistorialUI();
-}
-
-function actualizarListaHistorialUI() {
-  historyList.innerHTML = "";
-  MEMORIA_TETO.historial.forEach((url, i) => {
+// MANEJO DE HISTORIAL EN MEMORIA RAM
+function actualizarHistorialUI() {
+  historyUl.innerHTML = "";
+  MEMORIA_RAM.forEach((item, index) => {
     const li = document.createElement('li');
-    li.textContent = `${i + 1}. ${url}`;
-    li.onclick = () => {
-      MEMORIA_TETO.posicion = i;
-      webViewport.src = url;
-      browserUrlInput.value = url;
-    };
-    historyList.appendChild(li);
+    li.textContent = `${index + 1}. ${item}`;
+    historyUl.appendChild(li);
   });
 }
 
-// BOTÓN DE PÁNICO (BORRA TODO DE LA RAM)
-function destruccionPrivada() {
-  MEMORIA_TETO.historial = [];
-  MEMORIA_TETO.posicion = -1;
-  historyList.innerHTML = "";
-  webViewport.src = "about:blank";
-  searchInput.value = "";
-  browserUrlInput.value = "";
-  
-  browserView.classList.add('hidden');
-  historyPanel.classList.add('hidden');
-  tetoHome.classList.remove('hidden');
-  
-  alert("TetoSearch: ¡Historial y datos en memoria RAM eliminados!");
+function limpiarTodoEnRAM() {
+  MEMORIA_RAM.length = 0;
+  actualizarHistorialUI();
+  mainInput.value = "";
+  navUrlInput.value = "";
+  resultsContent.innerHTML = "";
+  resultsView.classList.add('hidden');
+  historyModal.classList.add('hidden');
+  searchView.classList.remove('hidden');
+  alert("TetoSearch: ¡Toda la memoria RAM ha sido destruida!");
 }
 
-// LISTENERS
+// EVENTOS
 searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  procesarBusqueda(searchInput.value);
-});
-
-btnSearch.addEventListener('click', () => {
-  procesarBusqueda(searchInput.value);
-});
-
-browserUrlInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    procesarBusqueda(browserUrlInput.value);
-  }
+  ejecutarBusqueda(mainInput.value);
 });
 
 btnHome.addEventListener('click', () => {
-  browserView.classList.add('hidden');
-  tetoHome.classList.remove('hidden');
+  resultsView.classList.add('hidden');
+  searchView.classList.remove('hidden');
 });
 
-btnReload.addEventListener('click', () => {
-  if (webViewport.src) webViewport.src = webViewport.src;
-});
-
-btnBack.addEventListener('click', () => {
-  if (MEMORIA_TETO.posicion > 0) {
-    MEMORIA_TETO.posicion--;
-    const url = MEMORIA_TETO.historial[MEMORIA_TETO.posicion];
-    webViewport.src = url;
-    browserUrlInput.value = url;
-  }
-});
-
-btnForward.addEventListener('click', () => {
-  if (MEMORIA_TETO.posicion < MEMORIA_TETO.historial.length - 1) {
-    MEMORIA_TETO.posicion++;
-    const url = MEMORIA_TETO.historial[MEMORIA_TETO.posicion];
-    webViewport.src = url;
-    browserUrlInput.value = url;
-  }
-});
-
-openHistoryBtn.addEventListener('click', () => historyPanel.classList.remove('hidden'));
-btnToggleHistory.addEventListener('click', () => historyPanel.classList.toggle('hidden'));
-closeHistoryBtn.addEventListener('click', () => historyPanel.classList.add('hidden'));
-clearHistoryNow.addEventListener('click', destruccionPrivada);
-btnPanic.addEventListener('click', destruccionPrivada);
+btnRamHistory.addEventListener('click', () => historyModal.classList.remove('hidden'));
+closeHistory.addEventListener('click', () => historyModal.classList.add('hidden'));
+btnPanic.addEventListener('click', limpiarTodoEnRAM);
+btnPurgeRam.addEventListener('click', limpiarTodoEnRAM);
 
